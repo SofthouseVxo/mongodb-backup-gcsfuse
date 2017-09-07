@@ -1,0 +1,43 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: mongodb-backup
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: mongodb-backup
+    spec:
+      containers:
+      - name: mongodb-backup
+        image: jonaseck/mongodb-backup:3.4.5
+        securityContext:
+          privileged: true
+          capabilities:
+            add:
+              - SYS_ADMIN
+        lifecycle:
+          preStop:
+            exec:
+              command: ["fusermount", "-u", "/backup"]
+        imagePullPolicy: Always
+        env:
+        - name: MONGO_HOST
+          value: mongo
+        - name: MONGO_DB
+          value: myDb
+        - name: STORAGE_BACKUP_BUCKET_NAME
+          value: mybucket
+        - name: BACKUP_PREFIX
+          value: test
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: "/credentials/google-application-credentials.json"
+        volumeMounts:
+        - name: google-application-credentials
+          mountPath: "/credentials"
+          readOnly: true
+      volumes:
+      - name: google-application-credentials
+        secret:
+          secretName: google-application-credentials
