@@ -19,11 +19,12 @@ Create a service account with the [roles/storage.objectAdmin](https://cloud.goog
         GCLOUD_PROJECT=$(gcloud config get-value project)
         gcloud projects add-iam-policy-binding $GCLOUD_PROJECT --member="serviceAccount:$SERVICE_ACCOUNT" --role="roles/storage.objectAdmin"
         gcloud iam service-accounts keys create google-application-credentials.json --iam-account=$SERVICE_ACCOUNT
+        kubectl create secret generic google-application-credentials.json --from-file=google-application-credentials.json
 ### Storage Bucket
 install the `gsutil` command line tool by executing `gcloud components install gsutil`
 Create a [storage bucket](https://cloud.google.com/storage/docs/creating-buckets#storage-create-bucket-gsutil):
 
-    gsutil mb gs://<bucket name>
+    gsutil mb gs://mybucket
 
 ### Usage
 
@@ -52,9 +53,9 @@ Create a [storage bucket](https://cloud.google.com/storage/docs/creating-buckets
                   command: ["fusermount", "-u", "/backup"]
             imagePullPolicy: Always
             env:
-            - name: MONGO_HOST
+            - name: MONGODB_HOST
               value: mongo
-            - name: MONGO_DB
+            - name: MONGODB_DB
               value: myDb
             - name: STORAGE_BACKUP_BUCKET_NAME
               value: mybucket

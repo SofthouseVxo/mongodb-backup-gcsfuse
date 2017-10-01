@@ -5,19 +5,19 @@ gcsfuse -o nonempty ${STORAGE_BACKUP_BUCKET_NAME} /backup
 
 MONGODB_USER=${MONGODB_USER:-${MONGODB_ENV_MONGODB_USER}}
 MONGODB_PASS=${MONGODB_PASS:-${MONGODB_ENV_MONGODB_PASS}}
-[[ ( -n  ${MONGODB_RS} ) ]] && MONGODB_HOST="${MONGODB_RS}/"
-MONGODB_HOST=${MONGODB_HOST}${MONGO_HOST}
-
-if [[ -n ${MONGO_RS} ]];then
-  EXTRA_OPTS=${EXTRA_OPTS:-'--oplog'}
-  EXTRA_OPTS_RESTORE=${EXTRA_OPTS_RESTORE:-'--oplogReplay'}
-fi
 
 [[ ( -z "${MONGODB_USER}" ) && ( -n "${MONGODB_PASS}" ) ]] && MONGODB_USER='admin'
 
 [[ ( -n "${MONGODB_USER}" ) ]] && USER_STR=" --username ${MONGODB_USER}"
 [[ ( -n "${MONGODB_PASS}" ) ]] && PASS_STR=" --password ${MONGODB_PASS}"
-[[ ( -n "${MONGODB_DB}" ) ]] && USER_STR=" --db ${MONGODB_DB}"
+
+if [[ -n ${MONGODB_RS} ]];then
+  MONGODB_HOST="${MONGODB_RS}/${MONGODB_HOST}"
+  EXTRA_OPTS=${EXTRA_OPTS:-'--oplog'}
+  EXTRA_OPTS_RESTORE=${EXTRA_OPTS_RESTORE:-'--oplogReplay'}
+else
+    [[ ( -n "${MONGODB_DB}" ) ]] && USER_STR=" --db ${MONGODB_DB}"
+fi
 
 BACKUP_CMD="mongodump --gzip --archive=/backup/\${BACKUP_NAME}.gz --host ${MONGODB_HOST} ${USER_STR}${PASS_STR}${DB_STR} ${EXTRA_OPTS}"
 

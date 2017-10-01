@@ -23,9 +23,9 @@ spec:
               command: ["fusermount", "-u", "/backup"]
         imagePullPolicy: Always
         env:
-        - name: MONGO_HOST
+        - name: MONGODB_HOST
           value: mongo
-        - name: MONGO_DB
+        - name: MONGODB_DB
           value: myDb
         - name: STORAGE_BACKUP_BUCKET_NAME
           value: mybucket
